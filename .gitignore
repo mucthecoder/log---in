@@ -1,1 +1,5 @@
-firebaseconfig.js
+# .gitignore
+.env
+.env.local
+.env.production
+

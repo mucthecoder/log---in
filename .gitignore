@@ -1,5 +1,3 @@
 # .gitignore
-.env
-.env.local
-.env.production
+env.js
 

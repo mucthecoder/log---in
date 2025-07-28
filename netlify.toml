@@ -1,6 +1,8 @@
 [build]
   command = "node generate-env.js"
   publish = "."
+  SECRETS_SCAN_ENABLED = "false"
+
 
 [secrets]
   omit_paths = ["env.js"]

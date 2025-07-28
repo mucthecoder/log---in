@@ -17,12 +17,12 @@
 
     </form>
   </div>
- <script src="firebaseconfig.js"></script>
+ 
  <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
   import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-
+  import { firebaseConfig } from './firebaseconfig.js';
   
 
   const app = initializeApp(firebaseConfig);

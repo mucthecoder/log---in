@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
   <title>Login</title>
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -13,61 +14,60 @@
       <button type="submit">Login</button>
       <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
       <hr />
-<button id="google-login" type="button">Sign in with Google</button>
-
+      <button id="google-login" type="button">Sign in with Google</button>
     </form>
   </div>
- 
- <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-  import { firebaseConfig } from './firebaseconfig.js';
-  
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+  <!-- Inject Firebase config from environment -->
+  <script src="env.js"></script>
 
-  // Normal email/password login
-  document.querySelector('form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = e.target[0].value;
-    const password = e.target[1].value;
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+    import { firebaseConfig } from './firebaseconfig.js';
 
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      alert('Logged in!');
-      console.log(userCredential.user);
-    } catch (err) {
-      alert('Error: ' + err.message);
-    }
-  });
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-  // Google login
-  const googleBtn = document.getElementById("google-login");
-  googleBtn.addEventListener("click", async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
+    // Email login
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
 
-      // Optional: store in Firestore
-      await setDoc(doc(db, "users", user.uid), {
-        uid: user.uid,
-        name: user.displayName,
-        email: user.email,
-        provider: "google",
-        createdAt: new Date()
-      }, { merge: true });
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        alert(`Logged in as ${userCredential.user.email}`);
+        console.log(userCredential.user);
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    });
 
-      alert("Signed in with Google!");
-      console.log(user);
-    } catch (err) {
-      alert("Google sign-in error: " + err.message);
-    }
-  });
-</script>
+    // Google login
+    document.getElementById('google-login').addEventListener('click', async () => {
+      const provider = new GoogleAuthProvider();
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
 
+        await setDoc(doc(db, "users", user.uid), {
+          uid: user.uid,
+          name: user.displayName,
+          email: user.email,
+          provider: "google",
+          createdAt: new Date()
+        }, { merge: true });
+
+        alert("Signed in with Google!");
+        console.log(user);
+      } catch (err) {
+        alert("Google sign-in error: " + err.message);
+      }
+    });
+  </script>
 </body>
 </html>

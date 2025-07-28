@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="form-container">
+    <h2>Login</h2>
+    <form id="login-form">
+      <input type="email" placeholder="Email" id="email" required />
+      <input type="password" placeholder="Password" id="password" required />
+      <button type="submit">Login</button>
+      <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
+      <hr />
+<button id="google-login" type="button">Sign in with Google</button>
+
+    </form>
+  </div>
+ <script src="firebaseconfig.js"></script>
+ <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+  
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Normal email/password login
+  document.querySelector('form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = e.target[0].value;
+    const password = e.target[1].value;
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      alert('Logged in!');
+      console.log(userCredential.user);
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  });
+
+  // Google login
+  const googleBtn = document.getElementById("google-login");
+  googleBtn.addEventListener("click", async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Optional: store in Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
+        name: user.displayName,
+        email: user.email,
+        provider: "google",
+        createdAt: new Date()
+      }, { merge: true });
+
+      alert("Signed in with Google!");
+      console.log(user);
+    } catch (err) {
+      alert("Google sign-in error: " + err.message);
+    }
+  });
+</script>
+
+</body>
+</html>
